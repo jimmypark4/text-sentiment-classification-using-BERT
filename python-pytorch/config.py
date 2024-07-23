@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 from torch import optim
 
@@ -42,7 +43,8 @@ def get_config(parse=True, **optional_kwargs):
     parser.add_argument('--patience', type=int, default=6)
     parser.add_argument('--learning-rate', type=float, default=1e-4)
     parser.add_argument('--optimizer', type=str, default='Adam')
-
+    time_now = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+    parser.add_argument('--name', type=str, default=f"{time_now}")
 
     kwargs = parser.parse_args()
     
