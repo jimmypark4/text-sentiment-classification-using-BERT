@@ -1,0 +1,19 @@
+mode: train
+
+model:
+  num_heads: ${hydra.range(2, 18, 2)}  # 2부터 16까지 2씩 증가
+  num_layers: ${hydra.range(2, 10, 2)}  # 2부터 8까지 2씩 증가
+
+training:
+  batch_size: 64
+  n_epoch: 10
+  learning_rate: 0.001
+  patience: 3
+  optimizer: torch.optim.Adam
+
+hydra:
+  run:
+    dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ./outputs/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}

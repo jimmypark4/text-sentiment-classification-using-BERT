@@ -21,10 +21,10 @@ class Solver(object):
             self.model = getattr(models, self.train_config.model)(self.train_config)
 
         for name, param in self.model.named_parameters():
-            
+
             if 'weight_hh' in name:
                 nn.init.orthogonal_(param)
-            
+
         if torch.cuda.is_available() and cuda:
             self.model.cuda()
 
@@ -37,7 +37,7 @@ class Solver(object):
         curr_patience = patience = self.train_config.patience
         num_trials=1
         self.criterion = criterion = nn.CrossEntropyLoss(reduction='mean')
-        
+
         best_valid_loss=float('inf')
         lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(self.optimizer, gamma=0.5)
 
@@ -87,11 +87,11 @@ class Solver(object):
                     print("Running out of patience, loading previous best model.")
                     num_trials -= 1
                     curr_patience = patience
-                    self.model.load_state_dict(torch.load(f'checkpoints/model_{self.train_config.name}.std'))
-                    self.optimizer.load_state_dict(torch.load(f'checkpoints/optim_{self.train_config.name}.std'))
+                    self.model.load_state_dict(torch.load(f'checkpoints/model_{self.train_config.name}.std',weights_only=True))
+                    self.optimizer.load_state_dict(torch.load(f'checkpoints/optim_{self.train_config.name}.std',weights_only=True))
                     lr_scheduler.step()
                     print(f"Current learning rate: {self.optimizer.state_dict()['param_groups'][0]['lr']}")
-            
+
             if num_trials <= 0:
                 print("Running out of patience, early stopping.")
                 break
@@ -112,7 +112,7 @@ class Solver(object):
             dataloader=self.test_data_loader
 
             if to_print:
-                self.model.load_state_dict(torch.load(f'checkpoints/model_{self.train_config.name}.std'))
+                self.model.load_state_dict(torch.load(f'checkpoints/model_{self.train_config.name}.std',weights_only=True))
 
 
         with torch.no_grad():
@@ -140,9 +140,9 @@ class Solver(object):
         y_pred = np.argmax(y_pred, axis=1)
 
         corrects=(y_true==y_pred)
-        
+
         accuracy=100*(sum(corrects)/len(corrects))
-        
+
         if to_print:
             print('accuracy: ', accuracy)
         return eval_loss, accuracy
